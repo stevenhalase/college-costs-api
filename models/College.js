@@ -3,6 +3,30 @@ const fs = require('fs')
 const path = require('path');
 
 class CollegeModel {
+	static collegeNameRequiredResponse(h) {
+		return h.response({
+			statusCode: 400,
+			error: 'College name is required',
+			message: 'Error: College name is required'
+		}).code(400);
+	}
+
+	static collegeNotFoundResponse(h) {
+		return h.response({
+			statusCode: 404,
+			error: 'College not found',
+			message: 'Error: College not found'
+		}).code(404);
+	}
+
+	static internalServerErrorResponse(h) {
+		return h.response({
+			statusCode: 500,
+			error: 'Internal Server Error',
+			message: 'An internal server error occurred'
+		}).code(500);
+	}
+
 	static async loadColleges() {
 		return new Promise((resolve, reject) => {
 			const results = [];
@@ -25,11 +49,7 @@ class CollegeModel {
 				colleges
 			};
 		} catch (error) {
-			return h.response({
-				statusCode: 500,
-				error: 'Internal Server Error',
-				message: 'An internal server error occurred'
-			}).code(500);
+			return CollegeModel.internalServerErrorResponse(h);
 		}
 	}
 
@@ -38,33 +58,21 @@ class CollegeModel {
 			const { name } = req.query;
 	
 			if (!name) {
-				return h.response({
-					statusCode: 400,
-					error: 'College name is required',
-					message: 'Error: College name is required'
-				}).code(400);
+				return CollegeModel.collegeNameRequiredResponse(h);
 			}
 	
 			const colleges = await CollegeModel.loadColleges();
 			const college = colleges.find(college => college.College === name);
 	
 			if(!college) {
-				return h.response({
-					statusCode: 404,
-					error: 'College not found',
-					message: 'Error: College not found'
-				}).code(404);
+				return CollegeModel.collegeNotFoundResponse(h);
 			}
 			
 			return {
 				college
 			};
 		} catch (error) {
-			return h.response({
-				statusCode: 500,
-				error: 'Internal Server Error',
-				message: 'An internal server error occurred'
-			}).code(500);
+			return CollegeModel.internalServerErrorResponse(h);
 		}
 	}
 
@@ -73,22 +81,14 @@ class CollegeModel {
 			const { name, outOfState, roomAndBoard } = req.query;
 	
 			if (!name) {
-				return h.response({
-					statusCode: 400,
-					error: 'College name is required',
-					message: 'Error: College name is required'
-				}).code(400);
+				return CollegeModel.collegeNameRequiredResponse(h);
 			}
 	
 			const colleges = await CollegeModel.loadColleges();
 			const college = colleges.find(college => college.College === name);
 	
 			if(!college) {
-				return h.response({
-					statusCode: 404,
-					error: 'College not found',
-					message: 'Error: College not found'
-				}).code(404);
+				return CollegeModel.collegeNotFoundResponse(h);
 			}
 	
 			let totalCost = 0;
@@ -110,11 +110,7 @@ class CollegeModel {
 				cost: parseFloat(totalCost)
 			};
 		} catch (error) {
-			return h.response({
-				statusCode: 500,
-				error: 'Internal Server Error',
-				message: 'An internal server error occurred'
-			}).code(500);
+			return CollegeModel.internalServerErrorResponse(h);
 		}
 	}
 }

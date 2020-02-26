@@ -51,6 +51,60 @@ beforeEach(() => {
 });
 
 describe('CollegeModel', () => {
+	describe('collegeNameRequiredResponse', () => {
+		it('sets correct response', () => {
+			CollegeModel.collegeNameRequiredResponse(mockHInstance);
+
+			expect(mockHInstance.response).toHaveBeenCalled();
+			expect(mockHInstance.response).toHaveBeenCalledTimes(1);
+			expect(mockHInstance.response).toHaveBeenNthCalledWith(1, {
+				statusCode: 400,
+				error: 'College name is required',
+				message: 'Error: College name is required'
+			});
+
+			expect(mockResponseInstance.code).toHaveBeenCalled();
+			expect(mockResponseInstance.code).toHaveBeenCalledTimes(1);
+			expect(mockResponseInstance.code).toHaveBeenNthCalledWith(1, 400);
+		});
+	});
+
+	describe('collegeNotFoundResponse', () => {
+		it('sets correct response', () => {
+			CollegeModel.collegeNotFoundResponse(mockHInstance);
+
+			expect(mockHInstance.response).toHaveBeenCalled();
+			expect(mockHInstance.response).toHaveBeenCalledTimes(1);
+			expect(mockHInstance.response).toHaveBeenNthCalledWith(1, {
+				statusCode: 404,
+				error: 'College not found',
+				message: 'Error: College not found'
+			});
+
+			expect(mockResponseInstance.code).toHaveBeenCalled();
+			expect(mockResponseInstance.code).toHaveBeenCalledTimes(1);
+			expect(mockResponseInstance.code).toHaveBeenNthCalledWith(1, 404);
+		});
+	});
+
+	describe('internalServerErrorResponse', () => {
+		it('sets correct response', () => {
+			CollegeModel.internalServerErrorResponse(mockHInstance);
+
+			expect(mockHInstance.response).toHaveBeenCalled();
+			expect(mockHInstance.response).toHaveBeenCalledTimes(1);
+			expect(mockHInstance.response).toHaveBeenNthCalledWith(1, {
+				statusCode: 500,
+				error: 'Internal Server Error',
+				message: 'An internal server error occurred'
+			});
+
+			expect(mockResponseInstance.code).toHaveBeenCalled();
+			expect(mockResponseInstance.code).toHaveBeenCalledTimes(1);
+			expect(mockResponseInstance.code).toHaveBeenNthCalledWith(1, 500);
+		});
+	});
+
 	describe('getAllColleges', () => {
 		it('calls loadColleges', async () => {
 			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
@@ -72,19 +126,15 @@ describe('CollegeModel', () => {
 		it('handles errors', async () => {
 			CollegeModel.loadColleges = jest.fn().mockRejectedValue('ERROR');
 
+			const original = CollegeModel.internalServerErrorResponse;
+			CollegeModel.internalServerErrorResponse = jest.fn();
+
 			await CollegeModel.getAllColleges(mockReq, mockHInstance);
 
-			expect(mockHInstance.response).toHaveBeenCalled();
-			expect(mockHInstance.response).toHaveBeenCalledTimes(1);
-			expect(mockHInstance.response).toHaveBeenNthCalledWith(1, {
-				statusCode: 500,
-				error: 'Internal Server Error',
-				message: 'An internal server error occurred'
-			});
+			expect(CollegeModel.internalServerErrorResponse).toHaveBeenCalled();
+			expect(CollegeModel.internalServerErrorResponse).toHaveBeenCalledTimes(1);
 
-			expect(mockResponseInstance.code).toHaveBeenCalled();
-			expect(mockResponseInstance.code).toHaveBeenCalledTimes(1);
-			expect(mockResponseInstance.code).toHaveBeenNthCalledWith(1, 500);
+			CollegeModel.internalServerErrorResponse = original;
 		});
 	});
 	
@@ -92,21 +142,17 @@ describe('CollegeModel', () => {
 		it('handles missing name', async () => {
 			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
 
+			const original = CollegeModel.collegeNameRequiredResponse;
+			CollegeModel.collegeNameRequiredResponse = jest.fn();
+
 			mockReq.query.name = '';
 
 			await CollegeModel.getCollege(mockReq, mockHInstance);
 
-			expect(mockHInstance.response).toHaveBeenCalled();
-			expect(mockHInstance.response).toHaveBeenCalledTimes(1);
-			expect(mockHInstance.response).toHaveBeenNthCalledWith(1, {
-				statusCode: 400,
-				error: 'College name is required',
-				message: 'Error: College name is required'
-			});
+			expect(CollegeModel.collegeNameRequiredResponse).toHaveBeenCalled();
+			expect(CollegeModel.collegeNameRequiredResponse).toHaveBeenCalledTimes(1);
 
-			expect(mockResponseInstance.code).toHaveBeenCalled();
-			expect(mockResponseInstance.code).toHaveBeenCalledTimes(1);
-			expect(mockResponseInstance.code).toHaveBeenNthCalledWith(1, 400);
+			CollegeModel.collegeNameRequiredResponse = original;
 		});
 
 		it('calls loadColleges', async () => {
@@ -121,21 +167,17 @@ describe('CollegeModel', () => {
 		it('handles unfound college', async () => {
 			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
 
+			const original = CollegeModel.collegeNotFoundResponse;
+			CollegeModel.collegeNotFoundResponse = jest.fn();
+
 			mockReq.query.name = 'Some College';
 
 			await CollegeModel.getCollege(mockReq, mockHInstance);
 
-			expect(mockHInstance.response).toHaveBeenCalled();
-			expect(mockHInstance.response).toHaveBeenCalledTimes(1);
-			expect(mockHInstance.response).toHaveBeenNthCalledWith(1, {
-				statusCode: 404,
-				error: 'College not found',
-				message: 'Error: College not found'
-			});
+			expect(CollegeModel.collegeNotFoundResponse).toHaveBeenCalled();
+			expect(CollegeModel.collegeNotFoundResponse).toHaveBeenCalledTimes(1);
 
-			expect(mockResponseInstance.code).toHaveBeenCalled();
-			expect(mockResponseInstance.code).toHaveBeenCalledTimes(1);
-			expect(mockResponseInstance.code).toHaveBeenNthCalledWith(1, 404);
+			CollegeModel.collegeNotFoundResponse = original;
 		});
 
 		it('correctly returns college', async () => {
@@ -151,27 +193,37 @@ describe('CollegeModel', () => {
 				'Room & Board': '11274.43'
 			});
 		})
+		
+		it('handles errors', async () => {
+			CollegeModel.loadColleges = jest.fn().mockRejectedValue('ERROR');
+
+			const original = CollegeModel.internalServerErrorResponse;
+			CollegeModel.internalServerErrorResponse = jest.fn();
+
+			await CollegeModel.getCollege(mockReq, mockHInstance);
+
+			expect(CollegeModel.internalServerErrorResponse).toHaveBeenCalled();
+			expect(CollegeModel.internalServerErrorResponse).toHaveBeenCalledTimes(1);
+
+			CollegeModel.internalServerErrorResponse = original;
+		});
 	});
 	
 	describe('getCollegeCost', () => {
 		it('handles missing name', async () => {
 			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
 
+			const original = CollegeModel.collegeNameRequiredResponse;
+			CollegeModel.collegeNameRequiredResponse = jest.fn();
+
 			mockReq.query.name = '';
 
 			await CollegeModel.getCollegeCost(mockReq, mockHInstance);
 
-			expect(mockHInstance.response).toHaveBeenCalled();
-			expect(mockHInstance.response).toHaveBeenCalledTimes(1);
-			expect(mockHInstance.response).toHaveBeenNthCalledWith(1, {
-				statusCode: 400,
-				error: 'College name is required',
-				message: 'Error: College name is required'
-			});
+			expect(CollegeModel.collegeNameRequiredResponse).toHaveBeenCalled();
+			expect(CollegeModel.collegeNameRequiredResponse).toHaveBeenCalledTimes(1);
 
-			expect(mockResponseInstance.code).toHaveBeenCalled();
-			expect(mockResponseInstance.code).toHaveBeenCalledTimes(1);
-			expect(mockResponseInstance.code).toHaveBeenNthCalledWith(1, 400);
+			CollegeModel.collegeNameRequiredResponse = original;
 		});
 
 		it('calls loadColleges', async () => {
@@ -186,21 +238,17 @@ describe('CollegeModel', () => {
 		it('handles unfound college', async () => {
 			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
 
+			const original = CollegeModel.collegeNotFoundResponse;
+			CollegeModel.collegeNotFoundResponse = jest.fn();
+
 			mockReq.query.name = 'Some College';
 
 			await CollegeModel.getCollegeCost(mockReq, mockHInstance);
 
-			expect(mockHInstance.response).toHaveBeenCalled();
-			expect(mockHInstance.response).toHaveBeenCalledTimes(1);
-			expect(mockHInstance.response).toHaveBeenNthCalledWith(1, {
-				statusCode: 404,
-				error: 'College not found',
-				message: 'Error: College not found'
-			});
+			expect(CollegeModel.collegeNotFoundResponse).toHaveBeenCalled();
+			expect(CollegeModel.collegeNotFoundResponse).toHaveBeenCalledTimes(1);
 
-			expect(mockResponseInstance.code).toHaveBeenCalled();
-			expect(mockResponseInstance.code).toHaveBeenCalledTimes(1);
-			expect(mockResponseInstance.code).toHaveBeenNthCalledWith(1, 404);
+			CollegeModel.collegeNotFoundResponse = original;
 		});
 
 		it('correctly calculates out-of-state', async () => {
@@ -246,5 +294,19 @@ describe('CollegeModel', () => {
 			const result = await CollegeModel.getCollegeCost(mockReq, mockHInstance);
 			expect(result.cost).toBe(65282.3);
 		})
+		
+		it('handles errors', async () => {
+			CollegeModel.loadColleges = jest.fn().mockRejectedValue('ERROR');
+
+			const original = CollegeModel.internalServerErrorResponse;
+			CollegeModel.internalServerErrorResponse = jest.fn();
+
+			await CollegeModel.getCollegeCost(mockReq, mockHInstance);
+
+			expect(CollegeModel.internalServerErrorResponse).toHaveBeenCalled();
+			expect(CollegeModel.internalServerErrorResponse).toHaveBeenCalledTimes(1);
+
+			CollegeModel.internalServerErrorResponse = original;
+		});
 	});
 });
