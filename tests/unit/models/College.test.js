@@ -32,12 +32,12 @@ let mockHInstance;
 let mockReq;
 
 beforeEach(() => {
-	function mockResponse() {};
+	function mockResponse() {}
 	mockResponse.prototype.code = jest.fn();
 
 	mockResponseInstance = new mockResponse();
 
-	function mockH() {};
+	function mockH() {}
 	mockH.prototype.response = jest.fn().mockReturnValue(mockResponseInstance);
 	mockHInstance = new mockH();
 
@@ -105,6 +105,50 @@ describe('CollegeModel', () => {
 		});
 	});
 
+	describe('loadCollege', () => {
+		it('calls loadColleges', async () => {
+			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
+
+			const name = 'A Fake College';
+
+			await CollegeModel.loadCollege(mockHInstance, name);
+
+			expect(CollegeModel.loadColleges).toHaveBeenCalled();
+			expect(CollegeModel.loadColleges).toHaveBeenCalledTimes(1);
+		});
+
+		it('handles unfound college', async () => {
+			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
+
+			const original = CollegeModel.collegeNotFoundResponse;
+			CollegeModel.collegeNotFoundResponse = jest.fn();
+
+			const name = 'Some College';
+
+			await CollegeModel.loadCollege(mockHInstance, name);
+
+			expect(CollegeModel.collegeNotFoundResponse).toHaveBeenCalled();
+			expect(CollegeModel.collegeNotFoundResponse).toHaveBeenCalledTimes(1);
+
+			CollegeModel.collegeNotFoundResponse = original;
+		});
+
+		it('returns college correctly', async () => {
+			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
+
+			const name = 'A Fake College';
+
+			const college = await CollegeModel.loadCollege(mockHInstance, name);
+
+			expect(college).toEqual({
+				'College': 'A Fake College',
+				'Tuition (in-state)': '54007.87',
+				'Tuition (out-of-state)': '34154.54',
+				'Room & Board': '11274.43'
+			});
+		});
+	});
+
 	describe('getAllColleges', () => {
 		it('calls loadColleges', async () => {
 			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
@@ -155,29 +199,19 @@ describe('CollegeModel', () => {
 			CollegeModel.collegeNameRequiredResponse = original;
 		});
 
-		it('calls loadColleges', async () => {
-			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
+		it('calls loadCollege', async () => {
+			const original = CollegeModel.loadCollege;
+			CollegeModel.loadCollege = jest.fn();
+
+			mockReq.query.name = 'A Fake College';
 
 			await CollegeModel.getCollege(mockReq, mockHInstance);
 
-			expect(CollegeModel.loadColleges).toHaveBeenCalled();
-			expect(CollegeModel.loadColleges).toHaveBeenCalledTimes(1);
-		});
+			expect(CollegeModel.loadCollege).toHaveBeenCalled();
+			expect(CollegeModel.loadCollege).toHaveBeenCalledTimes(1);
+			expect(CollegeModel.loadCollege).toHaveBeenNthCalledWith(1, {}, 'A Fake College');
 
-		it('handles unfound college', async () => {
-			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
-
-			const original = CollegeModel.collegeNotFoundResponse;
-			CollegeModel.collegeNotFoundResponse = jest.fn();
-
-			mockReq.query.name = 'Some College';
-
-			await CollegeModel.getCollege(mockReq, mockHInstance);
-
-			expect(CollegeModel.collegeNotFoundResponse).toHaveBeenCalled();
-			expect(CollegeModel.collegeNotFoundResponse).toHaveBeenCalledTimes(1);
-
-			CollegeModel.collegeNotFoundResponse = original;
+			CollegeModel.loadCollege = original;
 		});
 
 		it('correctly returns college', async () => {
@@ -192,7 +226,7 @@ describe('CollegeModel', () => {
 				'Tuition (out-of-state)': '34154.54',
 				'Room & Board': '11274.43'
 			});
-		})
+		});
 		
 		it('handles errors', async () => {
 			CollegeModel.loadColleges = jest.fn().mockRejectedValue('ERROR');
@@ -226,29 +260,19 @@ describe('CollegeModel', () => {
 			CollegeModel.collegeNameRequiredResponse = original;
 		});
 
-		it('calls loadColleges', async () => {
-			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
+		it('calls loadCollege', async () => {
+			const original = CollegeModel.loadCollege;
+			CollegeModel.loadCollege = jest.fn();
+
+			mockReq.query.name = 'A Fake College';
 
 			await CollegeModel.getCollegeCost(mockReq, mockHInstance);
 
-			expect(CollegeModel.loadColleges).toHaveBeenCalled();
-			expect(CollegeModel.loadColleges).toHaveBeenCalledTimes(1);
-		});
+			expect(CollegeModel.loadCollege).toHaveBeenCalled();
+			expect(CollegeModel.loadCollege).toHaveBeenCalledTimes(1);
+			expect(CollegeModel.loadCollege).toHaveBeenNthCalledWith(1, {}, 'A Fake College');
 
-		it('handles unfound college', async () => {
-			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
-
-			const original = CollegeModel.collegeNotFoundResponse;
-			CollegeModel.collegeNotFoundResponse = jest.fn();
-
-			mockReq.query.name = 'Some College';
-
-			await CollegeModel.getCollegeCost(mockReq, mockHInstance);
-
-			expect(CollegeModel.collegeNotFoundResponse).toHaveBeenCalled();
-			expect(CollegeModel.collegeNotFoundResponse).toHaveBeenCalledTimes(1);
-
-			CollegeModel.collegeNotFoundResponse = original;
+			CollegeModel.loadCollege = original;
 		});
 
 		it('correctly calculates out-of-state', async () => {
@@ -271,7 +295,7 @@ describe('CollegeModel', () => {
 
 			const result = await CollegeModel.getCollegeCost(mockReq, mockHInstance);
 			expect(result.cost).toBe(45428.97);
-		})
+		});
 
 		it('correctly calculates in-state', async () => {
 			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
@@ -282,7 +306,7 @@ describe('CollegeModel', () => {
 
 			const result = await CollegeModel.getCollegeCost(mockReq, mockHInstance);
 			expect(result.cost).toBe(54007.87);
-		})
+		});
 
 		it('correctly calculates in-state + room & board tuition', async () => {
 			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
@@ -293,7 +317,7 @@ describe('CollegeModel', () => {
 
 			const result = await CollegeModel.getCollegeCost(mockReq, mockHInstance);
 			expect(result.cost).toBe(65282.3);
-		})
+		});
 		
 		it('handles errors', async () => {
 			CollegeModel.loadColleges = jest.fn().mockRejectedValue('ERROR');

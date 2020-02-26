@@ -1,5 +1,5 @@
-const csv = require('csv-parser')
-const fs = require('fs')
+const csv = require('csv-parser');
+const fs = require('fs');
 const path = require('path');
 
 class CollegeModel {
@@ -39,7 +39,18 @@ class CollegeModel {
 				.on('error', (error) => {
 					reject(error);
 				});
-		})
+		});
+	}
+
+	static async loadCollege(h, name) {
+		const colleges = await CollegeModel.loadColleges();
+		const college = colleges.find(college => college.College === name);
+
+		if(!college) {
+			return CollegeModel.collegeNotFoundResponse(h);
+		}
+
+		return college;
 	}
 
 	static async getAllColleges(req, h) {
@@ -61,12 +72,7 @@ class CollegeModel {
 				return CollegeModel.collegeNameRequiredResponse(h);
 			}
 	
-			const colleges = await CollegeModel.loadColleges();
-			const college = colleges.find(college => college.College === name);
-	
-			if(!college) {
-				return CollegeModel.collegeNotFoundResponse(h);
-			}
+			const college = await CollegeModel.loadCollege(h, name);
 			
 			return {
 				college
@@ -83,13 +89,8 @@ class CollegeModel {
 			if (!name) {
 				return CollegeModel.collegeNameRequiredResponse(h);
 			}
-	
-			const colleges = await CollegeModel.loadColleges();
-			const college = colleges.find(college => college.College === name);
-	
-			if(!college) {
-				return CollegeModel.collegeNotFoundResponse(h);
-			}
+
+			const college = await CollegeModel.loadCollege(h, name);
 	
 			let totalCost = 0;
 	
