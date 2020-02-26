@@ -2,7 +2,22 @@ const csv = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
 
+class MissingNameError extends Error {};
+class NotFoundError extends Error {};
+class InternalServerError extends Error {};
+
 class CollegeModel {
+	static handleError(h, error) {
+		switch(true) {
+			case error instanceof MissingNameError:
+				return CollegeModel.collegeNameRequiredResponse(h);
+			case error instanceof NotFoundError:
+				return CollegeModel.collegeNotFoundResponse(h);
+			default:
+				return CollegeModel.internalServerErrorResponse(h);
+		}
+	}
+
 	static collegeNameRequiredResponse(h) {
 		return h.response({
 			statusCode: 400,
@@ -55,12 +70,12 @@ class CollegeModel {
 		});
 	}
 
-	static async loadCollege(h, name) {
+	static async loadCollege(name) {
 		const colleges = await CollegeModel.loadColleges();
 		const college = colleges.find(college => college.name === name);
-
+		
 		if(!college) {
-			return CollegeModel.collegeNotFoundResponse(h);
+			throw new NotFoundError();
 		}
 
 		return college;
@@ -73,7 +88,7 @@ class CollegeModel {
 				colleges
 			};
 		} catch (error) {
-			return CollegeModel.internalServerErrorResponse(h);
+			return CollegeModel.handleError(h, error);
 		}
 	}
 
@@ -82,16 +97,16 @@ class CollegeModel {
 			const { name } = req.query;
 	
 			if (!name) {
-				return CollegeModel.collegeNameRequiredResponse(h);
+				throw new MissingNameError();
 			}
 	
-			const college = await CollegeModel.loadCollege(h, name);
+			const college = await CollegeModel.loadCollege(name);
 			
 			return {
 				college
 			};
 		} catch (error) {
-			return CollegeModel.internalServerErrorResponse(h);
+			return CollegeModel.handleError(h, error);
 		}
 	}
 
@@ -100,10 +115,10 @@ class CollegeModel {
 			const { name, outOfState, roomAndBoard } = req.query;
 	
 			if (!name) {
-				return CollegeModel.collegeNameRequiredResponse(h);
+				throw new MissingNameError();
 			}
 
-			const college = await CollegeModel.loadCollege(h, name);
+			const college = await CollegeModel.loadCollege(name);
 	
 			let totalCost = 0;
 	
@@ -121,7 +136,7 @@ class CollegeModel {
 				cost: parseFloat(totalCost)
 			};
 		} catch (error) {
-			return CollegeModel.internalServerErrorResponse(h);
+			return CollegeModel.handleError(h, error);
 		}
 	}
 }
