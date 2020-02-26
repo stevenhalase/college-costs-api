@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">86.96% </span>
+                <span class="strong">77.08% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>40/46</span>
+                <span class='fraction'>37/48</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">81.25% </span>
+                <span class="strong">62.5% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>13/16</span>
+                <span class='fraction'>10/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">61.54% </span>
+                <span class="strong">57.14% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>8/13</span>
+                <span class='fraction'>8/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">86.67% </span>
+                <span class="strong">76.6% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>39/45</span>
+                <span class='fraction'>36/47</span>
             </div>
         
             
@@ -55,7 +55,7 @@
             Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
         </p>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -175,7 +175,17 @@
 <a name='L116'></a><a href='#L116'>116</a>
 <a name='L117'></a><a href='#L117'>117</a>
 <a name='L118'></a><a href='#L118'>118</a>
-<a name='L119'></a><a href='#L119'>119</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -198,6 +208,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -273,14 +296,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -322,12 +342,25 @@ class CollegeModel {
 		}).code(500);
 	}
 &nbsp;
+<span class="fstat-no" title="function not covered" >	st</span>atic mapData(data) {
+		const name = <span class="cstat-no" title="statement not covered" >data['College'];</span>
+		const inStateTuition = <span class="cstat-no" title="statement not covered" >parseFloat(data['Tuition (in-state)']);</span>
+		const outOfStateTuition = <span class="cstat-no" title="statement not covered" >parseFloat(data['Tuition (out-of-state)']);</span>
+		const roomAndBoard = <span class="cstat-no" title="statement not covered" >parseFloat(data['Room &amp; Board']);</span>
+<span class="cstat-no" title="statement not covered" >		return {</span>
+			name,
+			inStateTuition: (isNaN(inStateTuition) ? 0 : inStateTuition),
+			outOfStateTuition: (isNaN(outOfStateTuition) ? 0 : outOfStateTuition),
+			roomAndBoard: (isNaN(roomAndBoard) ? 0 : roomAndBoard)
+		};
+	}
+&nbsp;
 <span class="fstat-no" title="function not covered" >	st</span>atic async loadColleges() {
 <span class="cstat-no" title="statement not covered" >		return new Promise(<span class="fstat-no" title="function not covered" >(r</span>esolve, reject) =&gt; {</span>
 			const results = <span class="cstat-no" title="statement not covered" >[];</span>
 <span class="cstat-no" title="statement not covered" >			fs.createReadStream(path.join(__dirname, '../colleges.csv'))</span>
 				.pipe(csv())
-				.on('data', <span class="fstat-no" title="function not covered" >(d</span>ata) =&gt; <span class="cstat-no" title="statement not covered" >results.push(data))</span>
+				.on('data', <span class="fstat-no" title="function not covered" >(d</span>ata) =&gt; <span class="cstat-no" title="statement not covered" >results.push(CollegeModel.mapData(data)))</span>
 				.on('end', <span class="fstat-no" title="function not covered" >()</span> =&gt; {
 <span class="cstat-no" title="statement not covered" >					resolve(results);</span>
 				})
@@ -339,7 +372,7 @@ class CollegeModel {
 &nbsp;
 	static async loadCollege(h, name) {
 		const colleges = await CollegeModel.loadColleges();
-		const college = colleges.find(college =&gt; college.College === name);
+		const college = colleges.find(college =&gt; college.name === name);
 &nbsp;
 		if(!college) {
 			return CollegeModel.collegeNotFoundResponse(h);
@@ -390,16 +423,13 @@ class CollegeModel {
 			let totalCost = 0;
 	
 			if(roomAndBoard) {
-				const roomAndBoardCost = parseFloat(college['Room &amp; Board']);
-				totalCost += (isNaN(roomAndBoardCost) ? <span class="branch-0 cbranch-no" title="branch not covered" >0 </span>: roomAndBoardCost);
+				totalCost += college.roomAndBoard;
 			}
 	
 			if (outOfState) {
-				const outOfStateCost = parseFloat(college['Tuition (out-of-state)']);
-				totalCost += isNaN(outOfStateCost) ? <span class="branch-0 cbranch-no" title="branch not covered" >0 </span>: outOfStateCost;
+				totalCost += college.outOfStateTuition;
 			} else {
-				const inStateCost = parseFloat(college['Tuition (in-state)']);
-				totalCost += isNaN(inStateCost) ? <span class="branch-0 cbranch-no" title="branch not covered" >0 </span>: inStateCost;
+				totalCost += college.inStateTuition;
 			}
 			
 			return {
@@ -418,7 +448,7 @@ module.exports = CollegeModel;</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed Feb 26 2020 00:13:42 GMT-0700 (Mountain Standard Time)
+                at Wed Feb 26 2020 00:34:09 GMT-0700 (Mountain Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>

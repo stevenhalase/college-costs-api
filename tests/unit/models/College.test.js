@@ -2,28 +2,28 @@ const CollegeModel = require('../../../models/College');
 
 const mockColleges = [
 	{
-		'College': 'Adelphi University',
-		'Tuition (in-state)': '38657',
-		'Tuition (out-of-state)': '',
-		'Room & Board': '15527'
+		name: 'Adelphi University',
+		inStateTuition: 38657,
+		outOfStateTuition: 0,
+		roomAndBoard: 15527
 	},
 	{
-		'College': 'Agnes Scott�College',
-		'Tuition (in-state)': '54007',
-		'Tuition (out-of-state)': '',
-		'Room & Board': '12449'
+		name: 'Agnes Scott College',
+		inStateTuition: 54007,
+		outOfStateTuition: 0,
+		roomAndBoard: 12449
 	},
 	{
-		'College': 'Albany College of Pharmacy',
-		'Tuition (in-state)': '34154',
-		'Tuition (out-of-state)': '',
-		'Room & Board': '11274'
+		name: 'Albany College of Pharmacy',
+		inStateTuition: 34154,
+		outOfStateTuition: 0,
+		roomAndBoard: 11274
 	},
 	{
-		'College': 'A Fake College',
-		'Tuition (in-state)': '54007.87',
-		'Tuition (out-of-state)': '34154.54',
-		'Room & Board': '11274.43'
+		name: 'A Fake College',
+		inStateTuition: 54007.87,
+		outOfStateTuition: 34154.54,
+		roomAndBoard: 11274.43
 	}
 ];
 
@@ -141,10 +141,10 @@ describe('CollegeModel', () => {
 			const college = await CollegeModel.loadCollege(mockHInstance, name);
 
 			expect(college).toEqual({
-				'College': 'A Fake College',
-				'Tuition (in-state)': '54007.87',
-				'Tuition (out-of-state)': '34154.54',
-				'Room & Board': '11274.43'
+				name: 'A Fake College',
+				inStateTuition: 54007.87,
+				outOfStateTuition: 34154.54,
+				roomAndBoard: 11274.43
 			});
 		});
 	});
@@ -221,10 +221,10 @@ describe('CollegeModel', () => {
 
 			const result = await CollegeModel.getCollege(mockReq, mockHInstance);
 			expect(result.college).toEqual({
-				'College': 'A Fake College',
-				'Tuition (in-state)': '54007.87',
-				'Tuition (out-of-state)': '34154.54',
-				'Room & Board': '11274.43'
+				name: 'A Fake College',
+				inStateTuition: 54007.87,
+				outOfStateTuition: 34154.54,
+				roomAndBoard: 11274.43
 			});
 		});
 		

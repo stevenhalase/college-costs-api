@@ -27,12 +27,25 @@ class CollegeModel {
 		}).code(500);
 	}
 
+	static mapData(data) {
+		const name = data['College'];
+		const inStateTuition = parseFloat(data['Tuition (in-state)']);
+		const outOfStateTuition = parseFloat(data['Tuition (out-of-state)']);
+		const roomAndBoard = parseFloat(data['Room & Board']);
+		return {
+			name,
+			inStateTuition: (isNaN(inStateTuition) ? 0 : inStateTuition),
+			outOfStateTuition: (isNaN(outOfStateTuition) ? 0 : outOfStateTuition),
+			roomAndBoard: (isNaN(roomAndBoard) ? 0 : roomAndBoard)
+		};
+	}
+
 	static async loadColleges() {
 		return new Promise((resolve, reject) => {
 			const results = [];
 			fs.createReadStream(path.join(__dirname, '../colleges.csv'))
 				.pipe(csv())
-				.on('data', (data) => results.push(data))
+				.on('data', (data) => results.push(CollegeModel.mapData(data)))
 				.on('end', () => {
 					resolve(results);
 				})
@@ -44,7 +57,7 @@ class CollegeModel {
 
 	static async loadCollege(h, name) {
 		const colleges = await CollegeModel.loadColleges();
-		const college = colleges.find(college => college.College === name);
+		const college = colleges.find(college => college.name === name);
 
 		if(!college) {
 			return CollegeModel.collegeNotFoundResponse(h);
@@ -95,16 +108,13 @@ class CollegeModel {
 			let totalCost = 0;
 	
 			if(roomAndBoard) {
-				const roomAndBoardCost = parseFloat(college['Room & Board']);
-				totalCost += (isNaN(roomAndBoardCost) ? 0 : roomAndBoardCost);
+				totalCost += college.roomAndBoard;
 			}
 	
 			if (outOfState) {
-				const outOfStateCost = parseFloat(college['Tuition (out-of-state)']);
-				totalCost += isNaN(outOfStateCost) ? 0 : outOfStateCost;
+				totalCost += college.outOfStateTuition;
 			} else {
-				const inStateCost = parseFloat(college['Tuition (in-state)']);
-				totalCost += isNaN(inStateCost) ? 0 : inStateCost;
+				totalCost += college.inStateTuition;
 			}
 			
 			return {

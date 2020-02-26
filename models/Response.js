@@ -1,10 +1,10 @@
 const Joi = require('@hapi/joi');
 
 const collegeModel = Joi.object({
-	'College': Joi.any().example('Adelphi University'),
-	'Tuition (in-state)': Joi.any().example('38657'),
-	'Tuition (out-of-state)': Joi.any().example('34154'),
-	'Room & Board': Joi.any().example('12449'),
+	name: Joi.any().example('Adelphi University'),
+	inStateTuition: Joi.any().example('38657'),
+	outOfStateTuition: Joi.any().example('34154'),
+	roomAndBoard: Joi.any().example('12449'),
 }).label('College');
 
 const collegeResponseModel = Joi.object({
