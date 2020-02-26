@@ -4,6 +4,7 @@
   "description": "College Costs API",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "jest",
     "coverage": "jest --coverage"
   },
