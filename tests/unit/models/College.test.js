@@ -1,5 +1,11 @@
 const CollegeModel = require('../../../models/College');
 
+const {
+	MissingNameError,
+	NotFoundError,
+	InternalServerError
+} = require('../../../errors');
+
 const mockColleges = [
 	{
 		name: 'Adelphi University',
@@ -105,6 +111,81 @@ describe('CollegeModel', () => {
 		});
 	});
 
+	describe('mapData', () => {
+		it('handles bad data', () => {
+			const result = CollegeModel.mapData(null);
+			expect(result).toBe(null);
+		});
+
+		it('handles malformed data', () => {
+			const malformed = {
+				'College': 'A College',
+				'Tuition (in-state)': 'abc',
+				'Tuition (out-of-state)': '123',
+				'Room & Board': 'zxc'
+			};
+
+			const expected = {
+				name: 'A College',
+				inStateTuition: 0,
+				outOfStateTuition: 123,
+				roomAndBoard: 0
+			};
+			const result = CollegeModel.mapData(malformed);
+			expect(result).toEqual(expected);
+		});
+
+		it('correctly maps data', () => {
+			const malformed = {
+				'College': 'A College',
+				'Tuition (in-state)': '123.45',
+				'Tuition (out-of-state)': '123',
+				'Room & Board': '124.56'
+			};
+
+			const expected = {
+				name: 'A College',
+				inStateTuition: 123.45,
+				outOfStateTuition: 123,
+				roomAndBoard: 124.56
+			};
+			const result = CollegeModel.mapData(malformed);
+			expect(result).toEqual(expected);
+		});
+	});
+
+	describe('loadColleges', () => {
+		it('returns Promise', () => {
+			const result = CollegeModel.loadColleges();
+			expect(result instanceof Promise).toBe(true);
+		});
+
+		it('handles bad data', async () => {
+			const original = CollegeModel.mapData;
+			CollegeModel.mapData = jest.fn().mockReturnValue(null);
+			const result = await CollegeModel.loadColleges();
+			expect(result).toEqual([]);
+			CollegeModel.mapData = original;
+		});
+
+		it('loads data successfully', async () => {
+			const original = CollegeModel.mapData;
+			let count = 0;
+			CollegeModel.mapData = jest.fn(() => {
+				count++;
+				return {
+					name: 'A College',
+					inStateTuition: 123.45,
+					outOfStateTuition: 123,
+					roomAndBoard: 124.56
+				};
+			});
+			const result = await CollegeModel.loadColleges();
+			expect(result.length).toBe(count);
+			CollegeModel.mapData = original;
+		});
+	});
+
 	describe('loadCollege', () => {
 		it('calls loadColleges', async () => {
 			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);
@@ -117,13 +198,15 @@ describe('CollegeModel', () => {
 			expect(CollegeModel.loadColleges).toHaveBeenCalledTimes(1);
 		});
 
-		// Test needs to be fixed
+		it('handles unfound college', async () => {
+			const name = 'Some College';
 
-		// it('handles unfound college', async () => {
-		// 	const name = 'Some College';
-
-		// 	expect(CollegeModel.loadCollege(name)).toThrow();
-		// });
+			try {
+				await CollegeModel.loadCollege(name);
+			} catch (error) {
+				expect(error instanceof NotFoundError).toBe(true);
+			}
+		});
 
 		it('returns college correctly', async () => {
 			CollegeModel.loadColleges = jest.fn().mockResolvedValue(mockColleges);

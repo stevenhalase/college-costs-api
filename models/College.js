@@ -2,9 +2,11 @@ const csv = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
 
-class MissingNameError extends Error {};
-class NotFoundError extends Error {};
-class InternalServerError extends Error {};
+const {
+	MissingNameError,
+	NotFoundError,
+	InternalServerError
+} = require('../errors');
 
 class CollegeModel {
 	static handleError(h, error) {
@@ -43,16 +45,20 @@ class CollegeModel {
 	}
 
 	static mapData(data) {
-		const name = data['College'];
-		const inStateTuition = parseFloat(data['Tuition (in-state)']);
-		const outOfStateTuition = parseFloat(data['Tuition (out-of-state)']);
-		const roomAndBoard = parseFloat(data['Room & Board']);
-		return {
-			name,
-			inStateTuition: (isNaN(inStateTuition) ? 0 : inStateTuition),
-			outOfStateTuition: (isNaN(outOfStateTuition) ? 0 : outOfStateTuition),
-			roomAndBoard: (isNaN(roomAndBoard) ? 0 : roomAndBoard)
-		};
+		let mappedData = null;
+		if (data) {
+			const name = data['College'];
+			const inStateTuition = parseFloat(data['Tuition (in-state)']);
+			const outOfStateTuition = parseFloat(data['Tuition (out-of-state)']);
+			const roomAndBoard = parseFloat(data['Room & Board']);
+			mappedData = {
+				name,
+				inStateTuition: (isNaN(inStateTuition) ? 0 : inStateTuition),
+				outOfStateTuition: (isNaN(outOfStateTuition) ? 0 : outOfStateTuition),
+				roomAndBoard: (isNaN(roomAndBoard) ? 0 : roomAndBoard)
+			};
+		}
+		return mappedData;
 	}
 
 	static async loadColleges() {
@@ -60,7 +66,12 @@ class CollegeModel {
 			const results = [];
 			fs.createReadStream(path.join(__dirname, '../colleges.csv'))
 				.pipe(csv())
-				.on('data', (data) => results.push(CollegeModel.mapData(data)))
+				.on('data', (data) => {
+					const mappedData = CollegeModel.mapData(data);
+					if (mappedData) {
+						results.push(mappedData);
+					}
+				})
 				.on('end', () => {
 					resolve(results);
 				})
